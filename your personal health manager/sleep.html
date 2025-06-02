@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YPH - Sleep</title>
+  <link rel="icon" href="img/favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background: #cce1d5;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: #faf0e6;
+      padding: 20px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .container {
+      width: 100%;
+      max-width: 1230px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      transition: all 0.2s;
+    }
+    .logo {
+      font: 600 28px/1 'Playfair Display', serif;
+      color: #009e74;
+      margin-bottom: 0;
+    }
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      overflow-x: auto;
+    }
+    .nav-links a {
+      font-family: 'Playfair Display', serif;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .nav-links a:hover {
+      transform: scale(1.05);
+      color: #009e74;
+    }
+    #logout {
+      font-family: 'Playfair Display', serif;
+      color: #faf0e6;
+      background: #009e74;
+      padding: 8px 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.2s;
+      margin-left: 12px;
+    }
+    #logout:hover {
+      background: #007a59;
+    }
+    .left-panel {
+      flex: 1 1 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      min-width: 0;
+      width: 100%;
+    }
+    .chart-box {
+      background: #fafafa;
+      border-radius: 12px;
+      padding: 20px;
+      height: 260px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      min-width: 0;
+    }
+    .chart-box canvas {
+      width: 100% !important;
+      height: 100% !important;
+      min-width: 0;
+    }
+    .stats-cards {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .card {
+      flex: 1 1 120px;
+      background: #faf0e6;
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      min-width: 110px;
+      margin-bottom: 5px;
+    }
+    .card h3 {
+      font-size: 13px;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      color: #009e74;
+    }
+    .card p {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .right-panel {
+      width: 100%;
+      max-width: 300px;
+      background: #fafafa;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      overflow-x: hidden;
+      flex-shrink: 0;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .form-group input,
+    .form-group select {
+      padding: 7px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 13px;
+      width: 100%;
+    }
+    .duration-inputs {
+      display: flex;
+      gap: 8px;
+    }
+    #hoursInput,
+    #minutesInput {
+      flex: 1;
+      min-width: 0;
+    }
+    .submit-btn {
+      width: 100%;
+      margin-top: 8px;
+      background: #009e74;
+      color: #fff;
+      padding: 9px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .submit-btn:hover {
+      background: #007a59;
+    }
+    #main_content {
+      margin-top: 40px;
+      transform: scale(1.1) translateX(-0.77%);
+      transform-origin: top center;
+      width: 100%;
+    }
+    .history-box {
+      background: #fafafa;
+      margin-top: 24px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+    }
+    .history-box h3 {
+      margin-bottom: 12px;
+      color: #009e74;
+      font-family: 'Playfair Display', serif;
+      flex-shrink: 0;
+    }
+    .history-list-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 120px;
+      margin-top: 8px;
+    }
+    #historyList {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    #historyList li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid #ddd;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 15px;
+    }
+    #historyList li:last-child {
+      border-bottom: none;
+    }
+    .delete-btn {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    footer {
+      background-color: #faf0e6;
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #555;
+      margin-top: auto;
+      width: 100%;
+    }
+    @media (max-width: 1000px) {
+      .container {
+        flex-direction: column;
+        gap: 28px;
+        align-items: stretch;
+      }
+      .left-panel,
+      .right-panel {
+        width: 100%;
+        max-width: 100%;
+      }
+      .stats-cards {
+        flex-wrap: wrap;
+      }
+      #main_content {
+        transform: scale(1) translateX(0);
+      }
+      .chart-box {
+        height: 220px;
+      }
+      .history-box {
+        max-width: 95%;
+      }
+    }
+    @media (max-width: 600px) {
+      .container {
+        flex-direction: column;
+        padding: 0 4vw;
+        gap: 20px;
+      }
+      .logo {
+        font-size: 22px;
+      }
+      .right-panel {
+        padding: 14px;
+      }
+      .left-panel {
+        gap: 14px;
+      }
+      .chart-box {
+        padding: 8px;
+        height: 160px;
+      }
+      .card {
+        padding: 10px;
+        font-size: 13px;
+        min-width: 90px;
+      }
+      #main_content {
+        margin-top: 16px;
+      }
+      .history-box {
+        margin-top: 18px;
+        max-width: 100%;
+        padding: 10px;
+      }
+      .history-list-wrapper {
+        max-height: 80px;
+      }
+      .delete-btn {
+        padding: 4px 6px;
+        font-size: 11px;
+      }
+      .nav-links {
+        gap: 15px;
+      }
+      #logout {
+        padding: 6px 9px;
+        font-size: 14px;
+      }
+    }
+    @media (max-width: 430px) {
+      .history-box h3,
+      .nav-links a,
+      .card h3,
+      .card p {
+        font-size: 11px;
+      }
+      .right-panel h2 {
+        font-size: 15px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+<header>
+  <div class="container" style="justify-content: space-between; align-items: center;">
+    <div class="logo">yph</div>
+    <nav class="nav-links">
+      <a href="fitness.html">Fitness</a>
+      <a href="food.html">Food</a>
+      <a href="sleep.html" style="color: #009e74; font-weight: 700;">Sleep</a>
+      <a href="mental.html">Mental Health</a>
+    </nav>
+    <a href="before_login.html" id="logout">Log out</a>
+  </div>
+</header>
+<main class="container" id="main_content">
+  <div class="left-panel">
+    <div class="chart-box"><canvas id="sleepChart"></canvas></div>
+    <div class="stats-cards">
+      <div class="card"><h3>Weekly Avg</h3><p id="avgSleep">0h 0m</p></div>
+      <div class="card"><h3>Today's Sleep</h3><p id="todaySleep">0h 0m</p></div>
+      <div class="card"><h3>Goal Status</h3><p id="goalStatus">--</p></div>
+    </div>
+    <section id="history" class="history-box">
+      <h3>Sleep History</h3>
+      <div class="history-list-wrapper">
+        <ul id="historyList"></ul>
+      </div>
+    </section>
+  </div>
+  <aside class="right-panel">
+    <h2>Log Sleep</h2>
+    <form id="sleepForm" autocomplete="off">
+      <div class="form-group">
+        <label for="dateInput">Date</label>
+        <input type="date" id="dateInput" required />
+      </div>
+      <div class="form-group">
+        <label for="qualityInput">Sleep Quality</label>
+        <select id="qualityInput" required>
+          <option value="" disabled selected>Select</option>
+          <option>Good</option>
+          <option>Average</option>
+          <option>Poor</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Duration</label>
+        <div class="duration-inputs">
+          <input type="number" id="hoursInput" min="0" max="24" placeholder="h" />
+          <input type="number" id="minutesInput" min="0" max="59" placeholder="m" />
+        </div>
+      </div>
+      <button type="submit" class="submit-btn">Add</button>
+    </form>
+  </aside>
+</main>
+<footer>&copy; 2025 Chanil Park. All rights reserved.</footer>
+<script>
+  const STORAGE_KEY = 'sleepData';
+  const getStoredData = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  const saveData = (d) => localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+  const getDateKey = (d) => d.toISOString().split('T')[0];
+  const dateInputEl = document.getElementById('dateInput');
+  const todayObj = new Date();
+  dateInputEl.valueAsNumber = todayObj.setHours(0, 0, 0, 0) - new Date().getTimezoneOffset() * 60000;
+  const sleepForm = document.getElementById('sleepForm');
+  sleepForm.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sleepForm.requestSubmit();
+    }
+  });
+  const ctx = document.getElementById('sleepChart').getContext('2d');
+  const labels = [];
+  const chartData = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    labels.push(date.toLocaleDateString(undefined, { weekday: 'short' }));
+    chartData.push(0);
+  }
+  const barChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ label: 'Hours', data: chartData, borderRadius: 6, backgroundColor: '#009e74' }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: 'Hours' } }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+  function updateStats(data) {
+    chartData.fill(0);
+    let sumMinutes = 0;
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      const key = getDateKey(date);
+      const logs = data[key] || [];
+      const total = Array.isArray(logs) ? logs.reduce((s, l) => s + l.minutes, 0) : (logs.minutes || logs || 0);
+      chartData[i] = Math.round((total / 60) * 100) / 100; // convert to hours, 2 decimal
+      sumMinutes += total;
+    }
+    barChart.update();
+    const avg = sumMinutes / 7;
+    const avgH = Math.floor(avg / 60);
+    const avgM = Math.round(avg % 60);
+    document.getElementById('avgSleep').textContent = `${avgH}h ${avgM}m`;
+    const todayKey = getDateKey(new Date());
+    const todayLogs = data[todayKey] || [];
+    const todayTotal = Array.isArray(todayLogs) ? todayLogs.reduce((s, l) => s + l.minutes, 0) : (todayLogs.minutes || todayLogs || 0);
+    const todayH = Math.floor(todayTotal / 60);
+    const todayM = todayTotal % 60;
+    document.getElementById('todaySleep').textContent = `${todayH}h ${todayM}m`;
+    document.getElementById('goalStatus').textContent = todayTotal >= 420 ? 'Reached!' : 'Sleep More!'; // 7 hours = 420 min
+    renderHistory(data);
+  }
+  function renderHistory(data) {
+    const list = document.getElementById('historyList');
+    list.innerHTML = '';
+    const entries = Object.entries(data).sort().reverse();
+    for (const [date, logs] of entries) {
+      const items = Array.isArray(logs) ? logs : [logs];
+      items.forEach((log, idx) => {
+        const h = Math.floor(log.minutes / 60);
+        const m = log.minutes % 60;
+        const li = document.createElement('li');
+        li.innerHTML = `<span><strong>${date}</strong> — ${h}h ${m}m (${log.quality || 'Unknown'})</span><button class="delete-btn" data-date="${date}" data-idx="${idx}">Delete</button>`;
+        list.appendChild(li);
+      });
+    }
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const date = this.getAttribute('data-date');
+        const idx = parseInt(this.getAttribute('data-idx'));
+        const data = getStoredData();
+        if (Array.isArray(data[date])) {
+          data[date].splice(idx, 1);
+          if (data[date].length === 0) delete data[date];
+        } else {
+          delete data[date];
+        }
+        saveData(data);
+        updateStats(data);
+      });
+    });
+  }
+  updateStats(getStoredData());
+  sleepForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const date = dateInputEl.value;
+    const hours = parseInt(document.getElementById('hoursInput').value || '0', 10);
+    const minutes = parseInt(document.getElementById('minutesInput').value || '0', 10);
+    const quality = document.getElementById('qualityInput').value;
+    if (!date || minutes < 0 || minutes > 59 || hours < 0 || !quality) {
+      alert('Please fill out all fields correctly.');
+      return;
+    }
+    const totalMinutes = hours * 60 + minutes;
+    const data = getStoredData();
+    if (!Array.isArray(data[date])) data[date] = [];
+    data[date].push({ minutes: totalMinutes, quality });
+    saveData(data);
+    updateStats(data);
+    this.reset();
+    dateInputEl.valueAsNumber = Date.now() - new Date().getTimezoneOffset() * 60000;
+  });
+</script>
+</body>
+</html>
