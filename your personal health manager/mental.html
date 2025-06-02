@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YPH - Mental Health</title>
+  <link rel="icon" href="img/favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background: #cce1d5; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+    header { background: #faf0e6; padding: 20px 0; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+    .container { width: 100%; max-width: 1230px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; transition: all 0.2s; }
+    .logo { font: 600 28px/1 'Playfair Display', serif; color: #009e74; margin-bottom: 0; }
+    .nav-links { display: flex; gap: 40px; flex-wrap: wrap; overflow-x: auto; }
+    .nav-links a { font-family: 'Playfair Display', serif; text-decoration: none; color: #333; font-weight: 500; transition: 0.2s; }
+    .nav-links a:hover { transform: scale(1.05); color: #009e74; }
+    #logout { font-family: 'Playfair Display', serif; color: #faf0e6; background: #009e74; padding: 8px 15px; border-radius: 10px; text-decoration: none; transition: background 0.2s; margin-left: 12px; }
+    #logout:hover { background: #007a59; }
+    .left-panel { flex: 1 1 350px; display: flex; flex-direction: column; gap: 25px; min-width: 0; width: 100%; }
+    .diary-box {
+      background: #fafafa;
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 180px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      min-width: 0;
+      max-width: 100%;
+      margin-bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .diary-content {
+      font-size: 16px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      color: #222;
+      margin-bottom: 10px;
+      max-height: 216px;
+      overflow-y: auto;
+      min-width: 0;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .diary-date {
+      color: #009e74;
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+    .diary-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #005a40;
+      margin-bottom: 8px;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .diary-rating {
+      margin-top: auto;
+      font-size: 15px;
+      color: #888;
+    }
+
+    .right-panel { width: 100%; max-width: 300px; background: #fafafa; border-radius: 12px; padding: 25px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); overflow-x: hidden; flex-shrink: 0; }
+    .form-group { display: flex; flex-direction: column; margin-bottom: 12px; }
+    .form-group label { font-size: 13px; margin-bottom: 4px; }
+    .form-group input,
+    .form-group textarea,
+    .form-group select { padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; width: 100%; }
+    .form-group textarea { min-height: 240px; resize: vertical; }
+    .submit-btn { width: 100%; margin-top: 8px; background: #009e74; color: #fff; padding: 9px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; transition: 0.2s; }
+    .submit-btn:hover { background: #007a59; }
+    #main_content { margin-top: 40px; transform: scale(1.1) translateX(-0.77%); transform-origin: top center; width: 100%; }
+    .history-box { background: #fafafa; margin-top: 24px; width: 100%; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); align-self: stretch; display: flex; flex-direction: column; }
+    .history-box h3 { margin-bottom: 12px; color: #009e74; font-family: 'Playfair Display', serif; flex-shrink: 0; }
+    .history-list-wrapper { flex: 1; overflow-y: auto; max-height: 120px; margin-top: 8px; }
+    #historyList { list-style: none; margin: 0; padding: 0; }
+    #historyList li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid #ddd;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    #historyList li.selected {
+      background: #d8f5ec;
+    }
+    #historyList li:last-child { border-bottom: none; }
+    .delete-btn {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .delete-btn:active { background: #d04545; }
+    footer { background-color: #faf0e6; text-align: center; padding: 20px; font-size: 14px; color: #555; margin-top: auto; width: 100%; }
+    @media (max-width: 1000px) {
+      .container { flex-direction: column; gap: 28px; align-items: stretch; }
+      .left-panel, .right-panel { width: 100%; max-width: 100%; }
+      #main_content { transform: scale(1) translateX(0); }
+      .diary-box { min-height: 110px; }
+    }
+    @media (max-width: 600px) {
+      .container { flex-direction: column; padding: 0 4vw; gap: 20px; }
+      .logo { font-size: 22px; }
+      .right-panel { padding: 14px; }
+      .left-panel { gap: 14px; }
+      .diary-box { padding: 10px; }
+      .card { padding: 10px; font-size: 13px; min-width: 90px; }
+      #main_content { margin-top: 16px; }
+      .history-box { margin-top: 18px; max-width: 100%; padding: 10px; }
+      .history-list-wrapper { max-height: 80px; }
+      .delete-btn { padding: 4px 6px; font-size: 11px; }
+      .nav-links { gap: 15px; }
+      #logout { padding: 6px 9px; font-size: 14px; }
+    }
+    @media (max-width: 430px) {
+      .history-box h3, .nav-links a, .card h3, .card p { font-size: 11px; }
+      .right-panel h2 { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container" style="justify-content: space-between; align-items: center;">
+    <div class="logo">yph</div>
+    <nav class="nav-links">
+      <a href="fitness.html">Fitness</a>
+      <a href="food.html">Food</a>
+      <a href="sleep.html">Sleep</a>
+      <a href="mental.html" style="color: #009e74; font-weight: 700;">Mental Health</a>
+    </nav>
+    <a href="before_login.html" id="logout">Log out</a>
+  </div>
+</header>
+<main class="container" id="main_content">
+  <div class="left-panel">
+    <div class="diary-box" id="diaryBox">
+      <div class="diary-date" id="diaryDate">No Entry Selected</div>
+      <div class="diary-title" id="diaryTitle"></div>
+      <div class="diary-content" id="diaryContent">Click an item in the history to view your diary entry.</div>
+      <div class="diary-rating" id="diaryRating"></div>
+    </div>
+    <section id="history" class="history-box">
+      <h3>Mental Health History</h3>
+      <div class="history-list-wrapper">
+        <ul id="historyList"></ul>
+      </div>
+    </section>
+  </div>
+  <aside class="right-panel">
+    <h2>Log Mental</h2>
+    <form id="mentalForm" autocomplete="off">
+      <div class="form-group">
+        <label for="dateInput">Date</label>
+        <input type="date" id="dateInput" required />
+      </div>
+      <div class="form-group">
+        <label for="ratingInput">Mental Health Rating (1=Bad ~ 5=Great)</label>
+        <select id="ratingInput" required>
+          <option value="" disabled selected>Select</option>
+          <option value="1">1 😞</option>
+          <option value="2">2 🙁</option>
+          <option value="3">3 😐</option>
+          <option value="4">4 🙂</option>
+          <option value="5">5 😃</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="diaryTitleInput">Diary Title</label>
+        <input type="text" id="diaryTitleInput" placeholder="Diary Title" />
+      </div>
+      <div class="form-group">
+        <label for="diaryInput">Diary Body</label>
+        <textarea id="diaryInput" placeholder="Write your thoughts..."></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Save</button>
+    </form>
+  </aside>
+</main>
+<footer>&copy; 2025 Chanil Park. All rights reserved.</footer>
+<script>
+  const STORAGE_KEY = 'mentalData';
+  const getStoredData = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  const saveData = (d) => localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+  const getDateKey = (d) => d.toISOString().split('T')[0];
+
+  const diaryBox = document.getElementById('diaryBox');
+  const diaryDate = document.getElementById('diaryDate');
+  const diaryTitle = document.getElementById('diaryTitle');
+  const diaryContent = document.getElementById('diaryContent');
+  const diaryRating = document.getElementById('diaryRating');
+
+  const dateInputEl = document.getElementById('dateInput');
+  const todayObj = new Date();
+  dateInputEl.valueAsNumber = todayObj.setHours(0, 0, 0, 0) - new Date().getTimezoneOffset() * 60000;
+
+  const diaryTitleInput = document.getElementById('diaryTitleInput');
+  const diaryInput = document.getElementById('diaryInput');
+  const ratingInput = document.getElementById('ratingInput');
+  const mentalForm = document.getElementById('mentalForm');
+
+  function renderHistory(data, selectedKey = null) {
+    const list = document.getElementById('historyList');
+    list.innerHTML = '';
+    const entries = Object.entries(data).sort().reverse();
+    entries.forEach(([date, entry]) => {
+      const title = entry.title ? ` - ${entry.title}` : '';
+      const li = document.createElement('li');
+      li.className = (date === selectedKey) ? 'selected' : '';
+      li.innerHTML = `<span><strong>${date}</strong>${title} — Rating: ${entry.rating || '?'} / 5</span>
+                <button class="delete-btn" data-date="${date}">Delete</button>`;
+      li.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-btn')) return;
+        setSelectedEntry(date);
+      });
+      list.appendChild(li);
+    });
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const date = this.getAttribute('data-date');
+        const data = getStoredData();
+        delete data[date];
+        saveData(data);
+        renderHistory(data);
+        resetDisplay();
+      });
+    });
+  }
+
+  function setSelectedEntry(date) {
+    const data = getStoredData();
+    const entry = data[date];
+    if (!entry) return resetDisplay();
+
+    diaryDate.textContent = date;
+    diaryTitle.textContent = entry.title || '(No Title)';
+    diaryContent.textContent = entry.diary || '(No diary written)';
+    diaryRating.textContent = `Mental Health Rating: ${entry.rating} / 5`;
+
+    dateInputEl.value = date;
+    diaryTitleInput.value = entry.title || '';
+    diaryInput.value = entry.diary || '';
+    ratingInput.value = entry.rating || '';
+
+    renderHistory(data, date);
+  }
+
+  function resetDisplay() {
+    diaryDate.textContent = 'No Entry Selected';
+    diaryTitle.textContent = '';
+    diaryContent.textContent = 'Click an item in the history to view your diary entry.';
+    diaryRating.textContent = '';
+  }
+
+  mentalForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const date = dateInputEl.value;
+    const rating = ratingInput.value;
+    const title = diaryTitleInput.value.trim();
+    const diary = diaryInput.value.trim();
+    if (!date || !rating) {
+      alert('Please fill out all fields.');
+      return;
+    }
+    const data = getStoredData();
+    data[date] = { rating, title, diary };
+    saveData(data);
+    renderHistory(data, date);
+    setSelectedEntry(date);
+  });
+
+  function tryAutoSelectToday() {
+    const todayKey = getDateKey(new Date());
+    const data = getStoredData();
+    if (data[todayKey]) {
+      setSelectedEntry(todayKey);
+    } else {
+      resetDisplay();
+    }
+  }
+
+  renderHistory(getStoredData());
+  tryAutoSelectToday();
+
+  dateInputEl.addEventListener('change', () => {
+    const key = dateInputEl.value;
+    const data = getStoredData();
+    if (data[key]) {
+      setSelectedEntry(key);
+    } else {
+      resetDisplay();
+      diaryTitleInput.value = '';
+      diaryInput.value = '';
+      ratingInput.value = '';
+    }
+  });
+
+  mentalForm.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
+      mentalForm.requestSubmit();
+    }
+  });
+</script>
+</body>
+</html>
